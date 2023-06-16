@@ -12,6 +12,8 @@ app.post("/", jsonParser, (req, res) => {
   console.log(req.body);
   console.log('signedMessage: ' + req.body.signedMessage);
 
+  console.log('ip: ' + req.ip)
+
   const signedMessageObject = req.body.signedMessage;
   const message = JSON.parse(signedMessageObject);
 
@@ -28,7 +30,7 @@ app.post("/", jsonParser, (req, res) => {
 
       // objectId: gw-dcid-<ucmnetid>
       const ucmnetid = objectId.split('gw-dcid-')[1];
-      
+
       console.log('ucmnetid: ' + ucmnetid);
       console.log('eventType: ' + eventType);
     }
