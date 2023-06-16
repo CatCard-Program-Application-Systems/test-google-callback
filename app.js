@@ -12,6 +12,28 @@ app.post("/", jsonParser, (req, res) => {
   console.log(req.body);
   console.log('signedMessage: ' + req.body.signedMessage);
 
+  const signedMessageObject = req.body.signedMessage;
+  const message = JSON.parse(signedMessageObject);
+
+  if (signedMessageObject.objectId) {
+    const [issuerId, objectId] = message.objectId.split('.');
+    const eventType = message.eventType;
+
+    if (!issuerId || !objectId) {
+      // invalid payload, request discarded
+      res.status(400).send({ message: 'invalid payload, request discarded' });
+    } else {
+      // if (eventType !== 'del' && eventType !== 'save')
+      //     return res.status(200).send({ message: `request accepted, but no action taken. event type "${eventType}" is not supported` });
+
+      // objectId: gw-dcid-<ucmnetid>
+      const ucmnetid = objectId.split('gw-dcid-')[1];
+      
+      console.log('ucmnetid: ' + ucmnetid);
+      console.log('eventType: ' + eventType);
+    }
+  }
+
   res.json(req.body);
 });
 
