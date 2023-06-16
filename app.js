@@ -10,6 +10,7 @@ app.get("/", (req, res) => res.type('html').send(html));
 app.post("/", jsonParser, (req, res) => {
   console.log("Received a request!");
   console.log(req.body);
+  console.log('signedMessage: ' + req.body.signedMessage);
 
   res.json(req.body);
 });
