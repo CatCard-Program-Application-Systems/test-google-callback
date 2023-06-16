@@ -1,8 +1,18 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+
 const app = express();
 const port = process.env.PORT || 3001;
+const jsonParser = bodyParser.json();
 
 app.get("/", (req, res) => res.type('html').send(html));
+
+app.post("/", jsonParser, (req, res) => {
+  console.log("Received a request!");
+  console.log(req.body);
+
+  res.json(req.body);
+});
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
@@ -55,6 +65,7 @@ const html = `
   <body>
     <section>
       Hello from Render!
+      Test Google Wallet API callback
     </section>
   </body>
 </html>
