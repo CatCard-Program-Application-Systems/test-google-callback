@@ -46,11 +46,18 @@ app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber",
     async (req, res) => {
         try {
             const { deviceId, serialNumber } = req.params;
-            const { pushToken } = req.body;
+            // const { pushToken } = req.body;
 
             console.log('deviceId: ' + deviceId)
             console.log('serialNumber: ' + serialNumber)
-            console.log('pushToken: ' + pushToken)
+            // console.log('pushToken: ' + pushToken)
+
+            console.log(req.body)
+
+            console.log('ip: ' + req.ip)
+
+            var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
+            console.log('ip address: ' + ip)
 
             // serialNumber: dcid-<ucmnetid>
             const ucmnetid = serialNumber.split('dcid-')[1];
