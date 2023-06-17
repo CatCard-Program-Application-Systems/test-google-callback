@@ -14,9 +14,9 @@ app.post("/", jsonParser, (req, res) => {
 
   console.log('ip: ' + req.ip)
 
-  var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
+  var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
   console.log('ip address: ' + ip)
-  
+
   const signedMessageObject = req.body.signedMessage;
   const message = JSON.parse(signedMessageObject);
 
@@ -42,35 +42,35 @@ app.post("/", jsonParser, (req, res) => {
   res.json(req.body);
 });
 
-app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber", 
-    async (req, res) => {
-        try {
-            const { deviceId, serialNumber } = req.params;
-            // const { pushToken } = req.body;
+app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber", jsonParser,
+  async (req, res) => {
+    try {
+      const { deviceId, serialNumber } = req.params;
+      const { pushToken } = req.body;
 
-            console.log('deviceId: ' + deviceId)
-            console.log('serialNumber: ' + serialNumber)
-            // console.log('pushToken: ' + pushToken)
+      console.log('deviceId: ' + deviceId)
+      console.log('serialNumber: ' + serialNumber)
+      console.log('pushToken: ' + pushToken)
 
-            console.log(req.body)
+      console.log(req.body)
 
-            console.log('ip: ' + req.ip)
+      console.log('ip: ' + req.ip)
 
-            var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
-            console.log('ip address: ' + ip)
+      var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+      console.log('ip address: ' + ip)
 
-            // serialNumber: dcid-<ucmnetid>
-            const ucmnetid = serialNumber.split('dcid-')[1];
+      // serialNumber: dcid-<ucmnetid>
+      const ucmnetid = serialNumber.split('dcid-')[1];
 
-           console.log('ucmnetid: ' + ucmnetid);
+      console.log('ucmnetid: ' + ucmnetid);
 
-            res.status(201).send("Registered");
-        }
-        catch (err) {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-        }
+      res.status(201).send("Registered");
     }
+    catch (err) {
+      console.log(err);
+      res.status(500).send("Internal Server Error");
+    }
+  }
 );
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
