@@ -4,18 +4,21 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = process.env.PORT || 3001;
 const jsonParser = bodyParser.json();
+const http = require('http');
 
 app.get("/", (req, res) => res.type('html').send(html));
 
 app.post("/", jsonParser, (req, res) => {
   console.log("Received a request!");
   console.log(req.body);
-  console.log('signedMessage: ' + req.body.signedMessage);
+  console.log(req.get('user-agent'));
 
-  console.log('ip: ' + req.ip)
 
   var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
   console.log('ip address: ' + ip)
+
+  const ipAddress = req.socket.remoteAddress;
+  console.log('ipAddress: socket ' + ipAddress);
 
   const signedMessageObject = req.body.signedMessage;
   const message = JSON.parse(signedMessageObject);
@@ -42,7 +45,31 @@ app.post("/", jsonParser, (req, res) => {
   res.json(req.body);
 });
 
-app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber", jsonParser,
+
+// apple request validation middleware
+function validateAppleRequest(req, res, next) {
+
+  if (!req.headers.authorization) {
+    return res.status(401).json({ error: 'No credentials sent!' });
+  }
+  // format: ApplePass <authenticationToken>
+  else if (req.headers.authorization.indexOf('ApplePass ') !== 0 ||
+    req.headers.authorization.split(' ').length !== 2 ||
+    req.headers.authorization.split(' ')[1] !== 'gCh1J7iEc4Rzaq1yMNiDsGJvY9V4EYn') {
+    return res.status(401).json({ error: 'Invalid credentials sent!' });
+  }
+
+  const { passIdentifier } = req.params;
+
+  if (passIdentifier !== "pass.edu.ucmerced.dcid") {
+    return res.status(400).send("Invalid passIdentifier");
+  }
+
+  next();
+}
+
+
+app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber", validateAppleRequest,
   async (req, res) => {
     try {
       const { deviceId, serialNumber } = req.params;
@@ -51,6 +78,8 @@ app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber", js
       console.log('deviceId: ' + deviceId)
       console.log('serialNumber: ' + serialNumber)
       console.log('pushToken: ' + pushToken)
+
+      console.log(req.headers.authorization)
 
       console.log(req.body)
 
@@ -73,10 +102,13 @@ app.post("/v1/devices/:deviceId/registrations/:passIdentifier/:serialNumber", js
   }
 );
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+// const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-server.keepAliveTimeout = 120 * 1000;
-server.headersTimeout = 120 * 1000;
+// server.keepAliveTimeout = 120 * 1000;
+// server.headersTimeout = 120 * 1000;
+
+http.createServer(app).listen(port, () => console.log(`Example app listening on port ${port}!`));
+
 
 const html = `
 <!DOCTYPE html>
